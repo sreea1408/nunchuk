@@ -17,5 +17,27 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-mod calibration;
+#[derive(Default)]
+pub struct Calibrator {
+    pub pos: f32,
+    pub neg: f32,
+}
 
+impl Calibrator {
+    pub fn calibrate_value(&self, value: f32) -> f32 {
+        let calibrated_value = if value > 0.0 {
+            value / self.pos
+        } else if value < 0.0 {
+            value / self.neg
+        } else {
+            0.0
+        };
+        if calibrated_value > 1.0 {
+            1.0
+        } else if calibrated_value < -1.0 {
+            -1.0
+        } else {
+            calibrated_value
+        }
+    }
+}
