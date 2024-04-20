@@ -18,4 +18,6 @@
 */
 
 mod calibration;
+mod nunchuk;
 
+pub use nunchuk::{Nunchuk, NunchukEvent};
