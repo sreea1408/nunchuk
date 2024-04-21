@@ -23,6 +23,10 @@ pub struct Calibrator {
 }
 
 impl Calibrator {
+    pub fn new(pos: f32, neg: f32) -> Self {
+        Calibrator { pos, neg }
+    }
+
     pub fn calibrate_value(&self, value: f32) -> f32 {
         let calibrated_value = if value > 0.0 {
             value / self.pos
@@ -38,5 +42,11 @@ impl Calibrator {
         } else {
             calibrated_value
         }
+    }
+}
+
+impl Default for Calibrator {
+    fn default() -> Self {
+        Calibrator::new(1.0, 1.0)
     }
 }

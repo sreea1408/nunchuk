@@ -34,8 +34,8 @@ pub enum NunchukEvent {
 pub struct Nunchuk {
     id: GamepadId,
     gilrs: Gilrs,
-    x_calibration: Option<Calibrator>,
-    y_calibration: Option<Calibrator>,
+    x_calibration: Calibrator,
+    y_calibration: Calibrator,
 }
 
 impl Nunchuk {
@@ -44,8 +44,8 @@ impl Nunchuk {
         Self {
             id,
             gilrs,
-            x_calibration: None,
-            y_calibration: None,
+            x_calibration: Default::default(),
+            y_calibration: Default::default(),
         }
     }
 
@@ -55,13 +55,13 @@ impl Nunchuk {
 
     pub fn set_x_calibration(&mut self, pos: f32, neg: f32) {
         if Nunchuk::is_calibration_valid(pos, neg) {
-            self.x_calibration = Some(Calibrator { pos, neg });
+            self.x_calibration = Calibrator::new(pos, neg);
         }
     }
 
     pub fn set_y_calibration(&mut self, pos: f32, neg: f32) {
         if Nunchuk::is_calibration_valid(pos, neg) {
-            self.y_calibration = Some(Calibrator { pos, neg });
+            self.y_calibration = Calibrator::new(pos, neg);
         }
     }
 
@@ -78,14 +78,9 @@ impl Nunchuk {
                         let gamepad = self.gilrs.gamepad(id);
                         let raw_x = gamepad.value(Axis::LeftStickX);
                         let raw_y = gamepad.value(Axis::LeftStickY);
-                        let calibrate_or_default =
-                            |axis_calibrator: &Option<Calibrator>, default| match axis_calibrator {
-                                Some(calibrator) => calibrator.calibrate_value(default),
-                                None => default,
-                            };
                         return NunchukEvent::XY(
-                            calibrate_or_default(&self.x_calibration, raw_x),
-                            calibrate_or_default(&self.y_calibration, raw_y),
+                            self.x_calibration.calibrate_value(raw_x),
+                            self.y_calibration.calibrate_value(raw_y),
                         );
                     }
                     _ => return NunchukEvent::None,
